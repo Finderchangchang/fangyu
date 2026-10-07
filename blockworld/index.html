@@ -9,7 +9,16 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="controls.css?v=20261007-merchant">
   <link rel="stylesheet" href="/online-presence.css?v=20261002-names">
-  <script defer src="https://umami.jisikeji.cn/script.js" data-website-id="8674ef0a-e3d3-4d85-9559-c5ec4ba9c5a7"></script>
+  <script>
+    (function () {
+      if (location.hostname === "fangyu-statudy.up.railway.app") return;
+      var s = document.createElement("script");
+      s.defer = true;
+      s.src = "https://umami.jisikeji.cn/script.js";
+      s.setAttribute("data-website-id", "8674ef0a-e3d3-4d85-9559-c5ec4ba9c5a7");
+      document.head.appendChild(s);
+    })();
+  </script>
 </head>
 <body>
   <div id="game">
