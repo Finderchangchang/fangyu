@@ -1,0 +1,11 @@
+{
+  "name": "fangyu",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Block Isle standalone prototype deployment package",
+  "scripts": {
+    "start": "node deploy/blockworld/start.cjs",
+    "test": "node --test blockworld/tests/*.test.js"
+  },
+  "engines": { "node": ">=22" }
+}

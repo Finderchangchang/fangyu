@@ -1,0 +1,69 @@
+.online-presence {
+  position: fixed;
+  z-index: 1900;
+  top: 12px;
+  left: 14px;
+  min-width: 116px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 13px;
+  border: 1px solid #ffffff60;
+  border-radius: 999px;
+  color: #effff2;
+  background: #17342ee8;
+  box-shadow: 0 8px 24px #0005;
+  backdrop-filter: blur(8px);
+  font: 800 11px "Microsoft YaHei", system-ui, sans-serif;
+  white-space: nowrap;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.online-presence i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #c9ff55;
+  box-shadow: 0 0 9px #c9ff55;
+}
+
+.online-presence b {
+  color: #d8ff79;
+  font: 900 14px monospace;
+}
+
+.online-presence.offline i { background: #81908a; box-shadow: none; }
+.online-presence.offline b { color: #aab7b2; }
+.online-presence:focus-visible { outline: 3px solid #c9ff55; outline-offset: 3px; }
+.online-player-panel { position: fixed; z-index: 1901; top: 58px; left: 14px; width: min(330px, calc(100vw - 28px)); max-height: 65vh; overflow: auto; box-sizing: border-box; padding: 16px; border: 1px solid #ffffff60; border-radius: 16px; background: #17342ef5; color: #effff2; box-shadow: 0 8px 24px #0005; font: 14px/1.5 "Microsoft YaHei", system-ui, sans-serif; }
+.online-player-panel[hidden] { display: none; }
+.online-player-panel header { display: flex; align-items: center; justify-content: space-between; }
+.online-player-panel header button { padding: 0; min-width: 36px; min-height: 36px; color: white; background: #ffffff20; border: 0; border-radius: 8px; cursor: pointer; font-size: 24px; }
+.online-player-panel ul { padding: 0; margin: 10px 0; list-style: none; }
+.online-player-panel li { display: flex; flex-direction: column; padding: 9px 0; border-bottom: 1px solid #ffffff20; overflow-wrap: anywhere; }
+.online-player-panel small, .online-player-panel p { color: #bdd6c9; font-size: 12px; }
+.presence-blockworld .topbar { padding-top: 58px; }
+
+.presence-fps .top-hud { padding-left: 150px; }
+.presence-fps .home-nav { left: 150px; }
+.presence-extraction .topbar { padding-left: 132px; }
+.presence-extraction .lobby-header { padding-left: max(132px, calc((100vw - 1400px)/2)); }
+
+@media (max-width: 760px), (pointer: coarse) {
+  .online-presence {
+    top: 8px;
+    left: 8px;
+    min-width: 100px;
+    height: 34px;
+    padding: 0 10px;
+    gap: 6px;
+    font-size: 10px;
+  }
+
+  .presence-fps .top-hud { padding-left: 116px; }
+  .presence-fps .home-nav { left: 116px; }
+  .presence-extraction .topbar { padding-left: 110px; }
+  .presence-extraction .lobby-header { padding-left: 110px; }
+}

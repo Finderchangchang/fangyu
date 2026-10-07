@@ -1,0 +1,10 @@
+[hidden] { display: none !important; }
+.center-login { width: min(420px, 92vw); padding: 28px; box-sizing: border-box; border: 1px solid #526556; border-radius: 20px; background: #15241e; color: #edf4ef; font-family: system-ui, sans-serif; }
+.center-login h1 { margin-top: 0; font-size: 27px; }
+.center-login p, .center-login small { line-height: 1.6; }
+.center-login label { display: block; margin: 16px 0; }
+.center-login input { display: block; box-sizing: border-box; width: 100%; padding: 13px; margin-top: 8px; border-radius: 8px; border: 1px solid #769680; font-size: 16px; }
+.center-login button { width: 100%; padding: 13px; margin-top: 10px; border: 0; border-radius: 8px; background: #b7e65a; color: #112019; font-size: 16px; font-weight: bold; cursor: pointer; }
+.center-login .register { background: #385343; color: white; }
+.center-login button:disabled { opacity: .6; cursor: wait; }
+.center-login .account-error { color: #ffca9e; min-height: 24px; }

@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#78c8ff">
+  <title>方屿 · 3D 方块沙盒</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect x=%224%22 y=%224%22 width=%2224%22 height=%2224%22 rx=%226%22 fill=%22%2362ad4c%22/><path d=%22M4 15h24v13H4z%22 fill=%22%238d5c39%22/></svg>">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="controls.css?v=20261007-merchant">
+  <link rel="stylesheet" href="/online-presence.css?v=20261002-names">
+</head>
+<body>
+  <div id="game">
+    <div id="world"></div>
+    <div class="sun-glow"></div>
+    <div id="hud" class="hidden">
+      <header class="topbar">
+        <div class="brand"><i></i><span>方屿<small>BLOCK ISLE</small></span></div>
+        <div class="status"><span id="coords">X 0 · Y 0 · Z 0</span><b id="streamState">准备中</b></div>
+        <div class="topbar-actions"><button type="button" data-music aria-label="背景音乐开关" aria-pressed="true">音乐：开（M）</button><button id="backpackButton" aria-label="打开背包">背包</button><button id="pauseButton" aria-label="暂停">Ⅱ</button></div>
+      </header>
+      <div id="crosshair"><i></i><i></i></div>
+      <div id="worldClock" aria-label="游戏内时间">第 1 天 · 08:00 · 白天</div>
+      <div id="healthBar" aria-label="生命值"><div><i id="healthFill"></i></div><b id="healthLabel" aria-live="polite">生命 100 / 100</b></div>
+      <div id="eatProgress" hidden role="status"><span>吃肉 0%</span></div>
+      <div id="foodbelt" aria-label="食物选择"><button type="button" data-food="beef">牛肉 ×0（+30血）</button><button type="button" data-food="mutton">羊肉 ×0（+20血）</button><button type="button" data-food="goldenApple">金苹果</button><small>7 / 8 选肉 · 挖掘食用 · 1–6 切回方块</small></div>
+      <div id="targetHint"></div>
+      <div id="mineProgress" hidden><i></i><span>挖掘中 0%</span></div>
+      <div id="playerBadge" aria-live="polite"></div>
+      <div class="tips">
+        <span><kbd>左键 / Q</kbd> 挖掘方块</span>
+        <span><kbd>右键 / E</kbd> 放置方块</span>
+        <span><kbd>滚轮 / 1–6</kbd> 切换方块</span>
+      </div>
+      <div id="hotbar" aria-label="方块物品栏"></div>
+      <section id="merchantPanel" hidden aria-label="稀有商人的商店">
+        <h2>稀有商人</h2><p id="merchantStock"></p>
+        <button type="button" data-trade="omni50">100 石头 → 万能工具（50 耐久）</button>
+        <button type="button" data-trade="omni2">5 石头 → 万能工具（2 耐久）</button>
+        <button type="button" data-trade="goldenApple">100 石头 + 100 原木 → 金苹果</button>
+        <p>兑换工具挖方块均需 0.1 秒。每款工具同时持有一把，用完可再兑换。</p>
+        <p>金苹果：生命恢复至 1000、上限变为 1000；降至 100 或以下效果消失。不可叠加。</p>
+        <button id="closeMerchant" type="button">返回游戏</button>
+      </section>
+      <section id="backpackPanel" hidden aria-label="背包">
+        <header><b>背包</b><button id="closeBackpack" type="button">×</button></header>
+        <p id="backpackSummary">方块材料</p>
+        <div id="backpackItems"></div>
+        <div class="bag-pagination"><button id="bagPrevious" type="button">上一页</button><span id="bagPageLabel">第 1 / 1 页</span><button id="bagNext" type="button">下一页</button></div>
+        <h3>方块存放区</h3><p id="blockStorage"></p>
+        <button id="openWorkbench" type="button">工作台</button>
+      </section>
+      <div id="toolbelt" aria-label="工具栏">
+        <button type="button" data-tool="none" class="active">空手</button>
+        <button type="button" data-tool="axe">斧头</button>
+        <button type="button" data-tool="pickaxe">镐子</button>
+        <button type="button" data-tool="shovel">铲子</button>
+        <button type="button" data-tool="sword">石剑</button>
+        <button type="button" data-tool="omni">万能工具</button>
+        <button type="button" data-tool="omni50">万能工具（50耐久）</button>
+        <button type="button" data-tool="omni2">万能工具（2耐久）</button>
+        <button type="button" id="workbenchButton">工作台</button>
+      </div>
+      <div id="craftPanel" hidden>
+        <b>工作台</b><span>5 石头 + 5 原木</span>
+        <button type="button" data-craft="workbench">制作工作台</button>
+        <button type="button" data-craft="axe">制作斧头</button>
+        <button type="button" data-craft="pickaxe">制作镐子</button>
+        <button type="button" data-craft="shovel">制作铲子</button>
+        <button type="button" data-craft="sword">制作石剑（石头×10）</button>
+        <button type="button" id="craftBed">制作床（棉花×3 + 原木×3）</button>
+        <button type="button" id="closeCraft">关闭工作台</button>
+      </div>
+      <div id="mobileControls" aria-label="手机操作区">
+        <div id="moveJoystick" class="joystick" aria-label="移动摇杆"><i></i><b></b></div>
+        <div class="mobile-actions">
+          <button id="mobileJump" class="jump" type="button"><i>↑</i><span>跳跃</span></button>
+          <button id="mobileBreak" type="button" aria-label="挖掘方块"><i aria-hidden="true">⛏</i><span>挖掘方块</span></button>
+          <button id="mobilePlace" type="button" aria-label="放置方块"><i aria-hidden="true">＋</i><span>放置方块</span></button>
+        </div>
+        <p class="look-tip">滑动右半屏转动视角</p>
+      </div>
+    </div>
+
+    <section id="startScreen" class="screen active">
+      <nav><span>方屿 · 独立游戏</span><span>ORIGINAL WEB PROTOTYPE · 2026</span></nav>
+      <div class="hero">
+        <p class="eyebrow">FIRST-PERSON BLOCK SANDBOX</p>
+        <h1>造一座<br><em>自己的岛</em></h1>
+        <p class="intro">朝着视线的方向出发，穿过草坡与树林。远方的地形会随着探索不断展开，你的建造会自动保存在此浏览器中。</p>
+        <div class="actions">
+          <button id="startButton"><span>进入方屿</span><b>开始探索 →</b></button>
+          <button id="newWorldButton" class="secondary">生成新世界</button>
+          <button id="lobbyButton" class="secondary">大厅</button>
+        </div>
+        <div class="features">
+          <article><b>01</b><strong>自由建造</strong><span>6 种基础方块随意放置</span></article>
+          <article><b>02</b><strong>不断探索</strong><span>边走边生成新的地形</span></article>
+          <article><b>03</b><strong>本地存档</strong><span>自动保存你的改造</span></article>
+        </div>
+      </div>
+      <aside class="world-card">
+        <div class="mini-island">
+          <i class="cube c1"></i><i class="cube c2"></i><i class="cube c3"></i>
+          <i class="tree"></i>
+        </div>
+        <small>当前世界</small>
+        <strong id="worldName">晨风群岛</strong>
+        <p><span>世界种子</span><b id="seedLabel">----</b></p>
+        <p><span>游戏模式</span><b>探索</b></p>
+      </aside>
+      <footer><span>WASD 移动 · 空格跳跃 · 鼠标观察</span><span>建议使用桌面浏览器</span></footer>
+    </section>
+
+    <section id="loginScreen" class="screen auth-screen active">
+      <div class="auth-card">
+        <p class="eyebrow">PLAYER LOGIN</p>
+        <h2>进入你的方屿</h2>
+        <p>直接登录方屿。背包和地图随账号保存到服务器，原账号和存档继续使用。</p>
+        <label>玩家名字<input id="playerName" maxlength="16" autocomplete="username" placeholder="输入名字"></label>
+        <label>6 位数字密码<input id="playerPassword" type="password" inputmode="numeric" maxlength="6" autocomplete="current-password" placeholder="输入 6 位数字密码"></label>
+        <button id="loginButton" type="button">登录并开始</button>
+        <button id="registerButton" type="button">注册新账号（名字不能重复）</button>
+        <small id="loginError" role="alert"></small>
+      </div>
+    </section>
+
+    <section id="pauseScreen" class="screen modal">
+      <div class="panel">
+        <p class="eyebrow">游戏已暂停</p>
+        <h2>继续创造</h2>
+        <button id="resumeButton">返回世界</button>
+        <button type="button" data-ranking class="secondary">🏆 生存排行榜</button>
+        <button type="button" data-music class="secondary" aria-pressed="true">音乐：开（M）</button>
+        <button id="saveButton" class="secondary">保存世界</button>
+        <button type="button" class="secondary" onclick="window.FangyuDiagnostics?.download()">导出诊断日志</button>
+        <button id="homeButton" class="ghost">返回标题</button>
+        <small>换设备前请保存世界，确认同步成功；请勿清除本机备份。</small>
+      </div>
+    </section>
+
+    <section id="mapLobby" class="screen modal">
+      <button class="return-game-center" type="button" onclick="document.getElementById('closeLobby').click()">← 返回方屿</button>
+      <div class="panel lobby-panel">
+        <header class="map-lobby-header">
+        <p class="eyebrow">MAP LOBBY</p><h2>地图大厅</h2>
+        <p>选择之前的岛屿继续玩；新建岛屿不会覆盖旧岛屿。</p>
+        <form id="mapSearchForm" role="search"><input id="mapSearchInput" type="search" maxlength="100" aria-label="搜索地图名称" placeholder="输入地图名字，找回之前的岛屿…"><button type="submit">搜索</button><button id="clearMapSearch" type="button" class="ghost">清空</button></form>
+        <p id="mapResultCount" role="status" aria-live="polite"></p>
+        </header>
+        <div class="map-lobby-body"><section class="map-library" aria-label="我的地图">
+        <div id="mapList"></div>
+        <div class="map-pagination"><button id="previousMapPage" type="button">上一页</button><span id="mapPageLabel"></span><button id="nextMapPage" type="button">下一页</button></div>
+        </section><aside class="map-lobby-tools">
+        <button id="newIslandButton" type="button">＋ 新建岛屿</button>
+        <small>地图和背包随账号保存到服务器。换设备前请点“保存世界”，看到同步成功再切换；同一账号以最后进入的设备为准。旧网址的本地地图需要先从原网址上传。</small>
+        <button id="uploadLocalWorlds" type="button">上传本机旧地图（保留原存档）</button>
+        <label class="map-name-label">地图名称<input id="mapNameInput" maxlength="24" placeholder="给当前地图起名"></label>
+        <button id="renameMapButton">保存地图名称</button>
+        <hr>
+        <button type="button" data-ranking>🏆 生存排行榜</button>
+        <b>组队模式（最多 4 人）</b>
+        <label class="room-code-label">房间号</label>
+        <output id="roomCodeDisplay">------</output>
+        <div class="team-row"><input id="roomCodeInput" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="输入 6 位数字"><button id="createRoomButton">创建房间</button><button id="joinRoomButton">加入房间</button></div>
+        <small id="roomStatus">创建房间后，把 6 位数字发给好友</small>
+        <button id="closeLobby" class="ghost">返回方屿</button>
+        </aside></div>
+      </div>
+    </section>
+
+    <section id="survivalRanking" class="screen modal" role="dialog" aria-modal="true" aria-label="生存排行榜">
+      <div class="panel survival-ranking-panel">
+        <h2>🏆 生存排行榜</h2>
+        <p>累计生存天数越多，名次越靠前；相同天数并列。</p>
+        <small>现实 24 分钟 = 生存 1 天。跨地图累计，暂停和离线不计时；从本功能上线后开始统计。</small>
+        <p id="rankingStatus" role="status"></p>
+        <div class="ranking-table-scroll"><table><thead><tr><th>名次</th><th>玩家名字</th><th>生存天数</th></tr></thead><tbody id="rankingRows"></tbody></table></div>
+        <div class="ranking-pagination"><button id="rankingPrevious" type="button">上一页</button><span id="rankingPage"></span><button id="rankingNext" type="button">下一页</button></div>
+        <button id="refreshRanking" type="button" class="secondary">刷新排行</button><button id="closeRanking" type="button">返回</button>
+      </div>
+    </section>
+    <div id="toast"></div>
+    <div id="loadingStatus" role="status" hidden></div>
+  </div>
+  <script type="importmap">
+    {"imports":{"three":"./vendor/three/three.module.js","three/addons/controls/PointerLockControls.js":"./vendor/three/PointerLockControls.js"}}
+  </script>
+  <script src="diagnostics.js?v=20261007"></script>
+  <script src="/center-account.js?v=20261007-standalone"></script>
+  <script type="module" src="game.js?v=20261007-merchant" onerror="window.GameAccount?.showError('游戏模块加载失败。请刷新重试；无需重新注册账号。')"></script>
+  <script src="/online-presence.js?v=20261002-names"></script>
+</body>
+</html>

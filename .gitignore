@@ -1,0 +1,32 @@
+# Runtime accounts, sessions, worlds, grants and rankings
+runtime-data/
+*-data/
+players*.json
+*-players*.json
+plan-accounts*.json
+redemptions*.json
+power-ranking*.json
+power-recharge-requests*.json
+recovery-grants*.json
+*.jsonl
+*.db
+*.sqlite*
+*.bak
+*.backup
+*.before-*
+# Credentials, logs, browser profiles and local artifacts
+.env
+.env.*
+*.pem
+*.key
+*.log
+*.err
+.chrome*/
+.playwright*/
+.codex/
+.agents/
+node_modules/
+exports/
+output/
+releases/
+*.zip
